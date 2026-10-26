@@ -1,0 +1,42 @@
+# Deploys the public/ folder to InfinityFree (raziems.free.nf) over FTP on every push to main.
+#
+# One-time setup in GitHub → Settings → Secrets and variables → Actions:
+#   Secrets:   FTP_USERNAME  (e.g. if0_12345678 — InfinityFree client area → the hosting account → "FTP Details")
+#              FTP_PASSWORD  (that hosting account's password, not the client-area login)
+#   Variables: FTP_SERVER_DIR (optional; defaults to /htdocs/ — use /raziems.free.nf/htdocs/ if the domain
+#              was added as an add-on domain to an account that already hosts another site)
+#
+# scripts/set-github-secrets.ps1 can create the two secrets for you.
+name: Deploy to InfinityFree
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: deploy
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out
+        uses: actions/checkout@v4
+
+      - name: Syntax check the front end
+        run: node --check public/assets/app.js
+
+      - name: Upload via FTP
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+        with:
+          server: ftpupload.net
+          port: 21
+          protocol: ftp
+          username: ${{ secrets.FTP_USERNAME }}
+          password: ${{ secrets.FTP_PASSWORD }}
+          local-dir: ./public/
+          server-dir: ${{ vars.FTP_SERVER_DIR || '/htdocs/' }}
+          exclude: |
+            **/.gitkeep
