@@ -38,7 +38,7 @@
   const UMMAH = 'https://ummahapi.com/api/qibla';
   const NOMINATIM = 'https://nominatim.openstreetmap.org';
   const MY_TZ = 'Asia/Kuala_Lumpur';
-  const KEYS = { current: 'sq_current', favs: 'sq_favs', settings: 'sq_settings', cache: 'sq_cache:', dismissed: 'sq_suggest_dismissed' };
+  const KEYS = { current: 'sq_current', favs: 'sq_favs', settings: 'sq_settings', cache: 'sq_cache:', dismissed: 'sq_suggest_dismissed', installDismissed: 'sq_install_dismissed' };
   const DEVELOPER = { name: 'Razie Mat Saman', email: 'raziems@msn.com' };
 
   const NAMES = {
@@ -133,6 +133,21 @@
       suggest_title: (l) => `Anda berada di ${l}?`, suggest_use: 'Tukar ke lokasi ini', suggest_dismiss: 'Tutup',
       suggest_gps: 'Cadangkan tukar lokasi apabila GPS mengesan anda berada di tempat lain',
       offline_note: 'Anda di luar talian. Data yang tersimpan digunakan.', online_note: 'Sambungan Internet dipulihkan.',
+      install_ios: 'Pasang di iPhone: tekan butang Kongsi di Safari, kemudian pilih "Add to Home Screen".',
+      install_android: 'Pasang aplikasi ini pada telefon anda untuk akses pantas tanpa membuka pelayar.',
+      install_btn: 'Pasang aplikasi', install_how: 'Cara', later: 'Tutup',
+      install_title: 'Pasang pada telefon',
+      install_intro: 'Aplikasi ini boleh dipasang seperti aplikasi biasa: ikon di skrin utama, dibuka skrin penuh, dan berfungsi walaupun di luar talian. Tiada muat turun daripada App Store atau Play Store diperlukan.',
+      install_ios_title: 'iPhone dan iPad (Safari)',
+      install_ios_1: 'Buka solat.site.je dalam Safari.',
+      install_ios_2: 'Tekan butang Kongsi, iaitu kotak dengan anak panah ke atas di bahagian bawah skrin.',
+      install_ios_3: 'Tatal ke bawah dan pilih "Add to Home Screen" (Tambah ke Skrin Utama), kemudian tekan "Add".',
+      install_ios_note: 'Apple tidak membenarkan laman web memasang dirinya secara automatik, jadi langkah ini perlu dibuat sekali sahaja.',
+      install_android_title: 'Android (Chrome)',
+      install_android_1: 'Buka solat.site.je dalam Chrome. Jika sepanduk "Pasang aplikasi" muncul, tekan butang itu dan sahkan.',
+      install_android_2: 'Jika tiada sepanduk, tekan menu tiga titik di penjuru atas kanan.',
+      install_android_3: 'Pilih "Install app" atau "Add to Home screen", kemudian sahkan.',
+      install_done: 'Selepas dipasang, buka aplikasi dari ikon di skrin utama seperti aplikasi lain.',
     },
     en: {
       nav_: 'Prayer times', nav_qibla: 'Qibla', nav_locations: 'Locations', nav_settings: 'Settings', nav_about: 'About',
@@ -199,6 +214,21 @@
       suggest_title: (l) => `Are you in ${l}?`, suggest_use: 'Switch to this location', suggest_dismiss: 'Dismiss',
       suggest_gps: 'Suggest switching location when GPS finds you somewhere else',
       offline_note: 'You are offline. Saved data is being used.', online_note: 'Back online.',
+      install_ios: 'Install on iPhone: tap the Share button in Safari, then choose "Add to Home Screen".',
+      install_android: 'Install this app on your phone for quick access without opening the browser.',
+      install_btn: 'Install app', install_how: 'How', later: 'Dismiss',
+      install_title: 'Install on your phone',
+      install_intro: 'This app can be installed like a normal app: an icon on the home screen, full-screen, and it works offline. Nothing to download from the App Store or Play Store.',
+      install_ios_title: 'iPhone and iPad (Safari)',
+      install_ios_1: 'Open solat.site.je in Safari.',
+      install_ios_2: 'Tap the Share button, the square with an arrow pointing up at the bottom of the screen.',
+      install_ios_3: 'Scroll down and choose "Add to Home Screen", then tap "Add".',
+      install_ios_note: 'Apple does not let websites install themselves automatically, so this is a one-time step.',
+      install_android_title: 'Android (Chrome)',
+      install_android_1: 'Open solat.site.je in Chrome. If an "Install app" banner appears, tap it and confirm.',
+      install_android_2: 'If there is no banner, tap the three-dot menu in the top-right corner.',
+      install_android_3: 'Choose "Install app" or "Add to Home screen", then confirm.',
+      install_done: 'Once installed, open the app from its home-screen icon like any other app.',
     },
   };
   const t = (key, ...args) => {
@@ -446,6 +476,31 @@
   }
 
   /* ---------- page: prayer times ---------- */
+  /* ---------- install banner: Share guidance on iOS, one-tap install on Android/Chrome ---------- */
+  const SHARE_ICON = '<svg class="share-ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l4 4h-3v8h-2V7H8l4-4z"/><path d="M5 11v9h14v-9h-2v7H7v-7H5z"/></svg>';
+  const isStandalone = () => window.matchMedia('(display-mode: standalone)').matches || navigator.standalone === true;
+  const isIOS = () => /iPhone|iPad|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+  function setupInstall() {
+    const bar = $('#installBar');
+    if (!bar || isStandalone()) return;
+    if (Date.now() - store.get(KEYS.installDismissed, 0) < 30 * 86400000) return;
+    const show = (html) => {
+      bar.innerHTML = html; bar.hidden = false;
+      $('[data-act="later"]', bar).addEventListener('click', () => { store.set(KEYS.installDismissed, Date.now()); bar.hidden = true; });
+    };
+    window.addEventListener('beforeinstallprompt', (ev) => {
+      ev.preventDefault();
+      show(`<span>📲 ${t('install_android')}</span><span class="spacer"></span><button class="btn sm primary" data-act="install">${t('install_btn')}</button><button class="btn sm" data-act="later">${t('later')}</button>`);
+      $('[data-act="install"]', bar).addEventListener('click', async () => {
+        ev.prompt();
+        const choice = await ev.userChoice.catch(() => ({ outcome: 'dismissed' }));
+        if (choice.outcome === 'accepted') bar.hidden = true;
+      });
+    });
+    window.addEventListener('appinstalled', () => { bar.hidden = true; });
+    if (isIOS()) show(`<span>📲 ${t('install_ios').replace('Kongsi', `Kongsi ${SHARE_ICON}`).replace('Share', `Share ${SHARE_ICON}`)}</span><span class="spacer"></span><a class="btn sm primary" href="#/about">${t('install_how')}</a><button class="btn sm" data-act="later">${t('later')}</button>`);
+  }
+
   /* ---------- GPS suggestion: "Are you in X?" when the phone is somewhere else ----------
      Only runs when location permission was already granted (never prompts on its own). */
   let suggestion = null, suggestionChecked = false;
@@ -874,6 +929,24 @@
           <p class="small muted">${t('home_tip')}</p>
         </div>
         <div class="card">
+          <div class="card-head"><h2>📲 ${t('install_title')}</h2></div>
+          <p class="small muted">${t('install_intro')}</p>
+          <h3>${t('install_ios_title')}</h3>
+          <ol class="steps">
+            <li>${t('install_ios_1')}</li>
+            <li>${t('install_ios_2').replace('Kongsi', `Kongsi ${SHARE_ICON}`).replace('Share', `Share ${SHARE_ICON}`)}</li>
+            <li>${t('install_ios_3')}</li>
+          </ol>
+          <p class="small muted">${t('install_ios_note')}</p>
+          <h3>${t('install_android_title')}</h3>
+          <ol class="steps">
+            <li>${t('install_android_1')}</li>
+            <li>${t('install_android_2')}</li>
+            <li>${t('install_android_3')}</li>
+          </ol>
+          <p class="small muted">${t('install_done')}</p>
+        </div>
+        <div class="card">
           <div class="card-head"><h2>${t('developer')}</h2></div>
           <ul class="list">
             <li><div class="body"><div class="title">${esc(DEVELOPER.name)}</div><div class="meta"><span>${t('developer')}</span></div></div></li>
@@ -897,6 +970,7 @@
   applyLang();
   route();
   if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(() => { /* offline support is optional */ });
+  setupInstall();
   window.addEventListener('offline', () => toast(t('offline_note')));
   window.addEventListener('online', () => toast(t('online_note')));
 })();

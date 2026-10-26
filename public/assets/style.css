@@ -180,6 +180,20 @@ label.check { display: flex; align-items: center; font-weight: 500; color: var(-
 }
 .suggest .spacer { flex: 1; }
 
+/* ---------- install banner ---------- */
+.install {
+  position: fixed; left: 50%; bottom: 1rem; transform: translateX(-50%); z-index: 29;
+  width: calc(100% - 2rem); max-width: 640px;
+  display: flex; align-items: center; gap: .5rem; flex-wrap: wrap;
+  padding: .6rem .9rem; border-radius: 12px; font-size: .9rem; font-weight: 500;
+  background: var(--surface); color: var(--text); border: 1px solid var(--border); box-shadow: 0 4px 16px rgba(0, 0, 0, .18);
+}
+.install .spacer { flex: 1; }
+.share-ic { width: 1.1em; height: 1.1em; vertical-align: -.15em; fill: var(--primary); }
+ol.steps { margin: .25rem 0 .75rem; padding-left: 1.3rem; }
+ol.steps li { margin: .25rem 0; }
+.card h3 { margin-top: .75rem; }
+
 /* ---------- favourites chips ---------- */
 .chips { display: flex; gap: .4rem; flex-wrap: wrap; margin-bottom: 1rem; }
 .chip {
@@ -311,4 +325,5 @@ table.month tr.friday td:first-child { color: var(--primary); }
   .next-box .n-name, .next-box .n-time { font-size: 1.35rem; }
   .compass { width: min(260px, 68vw); }
   .turn-arrow { width: 96px; height: 96px; }
+  .install { bottom: calc(4.8rem + env(safe-area-inset-bottom)); }
 }
