@@ -17,8 +17,11 @@ Live site: https://solat.site.je/
 - **Locations & favourites** – use GPS (Malaysian coordinates are mapped to their JAKIM zone automatically), search
   any city (OpenStreetMap Nominatim), or pick a JAKIM zone. Star a location to keep it; favourites appear as one-tap
   chips at the top of every page, handy when travelling.
-- **Settings** – Malay or English prayer names, 12/24-hour clock, light/dark theme, calculation method, Asr school,
-  optional Imsak and Dhuha.
+- **Bahasa Malaysia / English** – the whole interface, prayer names, Hijri months and dates switch language.
+  Bahasa Malaysia is the default.
+- **Settings** – language, 12/24-hour clock, light/dark theme, calculation method, Asr school, optional Imsak and
+  Dhuha.
+- **About** – developer contact and data-source credits.
 
 Everything is stored in the browser (`localStorage`); there is no backend and no account. Responses are cached for
 12 hours so the page keeps working for a while without a connection.
