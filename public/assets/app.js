@@ -629,7 +629,6 @@
       if (arrow) { arrow.style.transform = `rotate(${diff}deg)`; arrow.classList.toggle('aligned', aligned); }
       const msg = aligned ? `<span class="live-on">${t('facing')}</span>` : `${diff > 0 ? '↻' : '↺'} ${esc(t('turn', diff > 0 ? 'right' : 'left', Math.abs(Math.round(diff))))}`;
       if (turnText) turnText.innerHTML = msg;
-      if (note) note.innerHTML = msg;
     };
     if ('ondeviceorientationabsolute' in window) window.addEventListener('deviceorientationabsolute', orientationHandler);
     else window.addEventListener('deviceorientation', orientationHandler);
