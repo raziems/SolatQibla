@@ -38,7 +38,7 @@
   const UMMAH = 'https://ummahapi.com/api/qibla';
   const NOMINATIM = 'https://nominatim.openstreetmap.org';
   const MY_TZ = 'Asia/Kuala_Lumpur';
-  const KEYS = { current: 'sq_current', favs: 'sq_favs', settings: 'sq_settings', cache: 'sq_cache:' };
+  const KEYS = { current: 'sq_current', favs: 'sq_favs', settings: 'sq_settings', cache: 'sq_cache:', dismissed: 'sq_suggest_dismissed' };
   const DEVELOPER = { name: 'Razie Mat Saman', email: 'raziems@msn.com' };
 
   const NAMES = {
@@ -63,7 +63,7 @@
     my: 17, sg: 11, id: 20, sa: 4, ae: 16, kw: 9, qa: 10, bh: 8, om: 8, eg: 5, sd: 5, ly: 5, pk: 1, bd: 1, in: 1, af: 1,
     tr: 13, ir: 7, ru: 14, fr: 12, us: 2, ca: 2, tn: 18, dz: 19, ma: 21, pt: 22, jo: 23,
   };
-  const DEFAULT_SETTINGS = { lang: 'ms', clock: '12', method: 'auto', school: 0, extra: false, theme: 'auto' };
+  const DEFAULT_SETTINGS = { lang: 'ms', clock: '12', method: 'auto', school: 0, extra: false, theme: 'auto', suggest: true };
   const DEFAULT_LOCATION = { id: 'jakim:PNG01', kind: 'jakim', zone: 'PNG01', cc: 'my', label: 'Pulau Pinang', sub: 'PNG01 · Pulau Pinang' };
 
   /* ---------- translations ---------- */
@@ -130,6 +130,9 @@
       why_2: 'Anda boleh menyimpan beberapa lokasi sebagai kegemaran dan bertukar antara lokasi dengan satu ketikan sahaja.',
       why_3: 'Aplikasi ini bebas iklan, tidak memerlukan pendaftaran akaun, dan direka supaya mesra pengguna.',
       feedback: 'Sebarang maklum balas untuk penambahbaikan boleh dihantar melalui e-mel ke',
+      suggest_title: (l) => `Anda berada di ${l}?`, suggest_use: 'Tukar ke lokasi ini', suggest_dismiss: 'Tutup',
+      suggest_gps: 'Cadangkan tukar lokasi apabila GPS mengesan anda berada di tempat lain',
+      offline_note: 'Anda di luar talian. Data yang tersimpan digunakan.', online_note: 'Sambungan Internet dipulihkan.',
     },
     en: {
       nav_: 'Prayer times', nav_qibla: 'Qibla', nav_locations: 'Locations', nav_settings: 'Settings', nav_about: 'About',
@@ -193,6 +196,9 @@
       why_2: 'You can save several locations as favourites and switch between them with a single tap.',
       why_3: 'The app is ad-free, needs no account, and is designed to be easy to use.',
       feedback: 'Feedback and suggestions for improvement are welcome by email at',
+      suggest_title: (l) => `Are you in ${l}?`, suggest_use: 'Switch to this location', suggest_dismiss: 'Dismiss',
+      suggest_gps: 'Suggest switching location when GPS finds you somewhere else',
+      offline_note: 'You are offline. Saved data is being used.', online_note: 'Back online.',
     },
   };
   const t = (key, ...args) => {
@@ -440,9 +446,41 @@
   }
 
   /* ---------- page: prayer times ---------- */
+  /* ---------- GPS suggestion: "Are you in X?" when the phone is somewhere else ----------
+     Only runs when location permission was already granted (never prompts on its own). */
+  let suggestion = null, suggestionChecked = false;
+  async function findSuggestion() {
+    if (suggestionChecked || !settings.suggest || !navigator.geolocation || !navigator.permissions?.query) return;
+    try {
+      const p = await navigator.permissions.query({ name: 'geolocation' });
+      if (p.state !== 'granted') return; // not granted yet: check again next time, still without prompting
+      suggestionChecked = true;
+      const { lat, lon } = await getGps();
+      const key = `${KEYS.cache}where:${lat.toFixed(2)},${lon.toFixed(2)}`;
+      let c = store.get(key, null);
+      if (!c || Date.now() - c.at > 6 * 3600000) { c = { at: Date.now(), loc: await locationFromCoords(lat, lon) }; store.set(key, c); }
+      const loc = c.loc;
+      if (loc.kind === 'geo' && typeof current.lat === 'number' && haversine(lat, lon, current.lat, current.lon) < 50) return;
+      if (loc.kind === 'jakim' && current.kind === 'jakim' && loc.zone === current.zone) return;
+      suggestion = loc;
+      drawSuggestion();
+    } catch { /* best effort only */ }
+  }
+  function drawSuggestion() {
+    const box = $('#suggest');
+    if (!box || !suggestion || suggestion.id === current.id || store.get(KEYS.dismissed, null) === suggestion.id) return;
+    box.hidden = false;
+    box.innerHTML = `<span>📍 ${esc(t('suggest_title', suggestion.label))}</span><span class="spacer"></span>
+      <button class="btn sm primary" data-act="use">${t('suggest_use')}</button><button class="btn sm" data-act="dismiss">${t('suggest_dismiss')}</button>`;
+    $('[data-act="use"]', box).addEventListener('click', () => { setCurrent(suggestion); renderPrayer(); });
+    $('[data-act="dismiss"]', box).addEventListener('click', () => { store.set(KEYS.dismissed, suggestion.id); box.hidden = true; });
+  }
+
   async function renderPrayer() {
-    app.innerHTML = `${chipsHtml()}<div class="card" id="prayer"><p class="muted">${esc(t('loading_times', current.label))}</p></div><div id="month"></div>`;
+    app.innerHTML = `<div class="suggest" id="suggest" hidden></div>${chipsHtml()}<div class="card" id="prayer"><p class="muted">${esc(t('loading_times', current.label))}</p></div><div id="month"></div>`;
     bindChips(app, renderPrayer);
+    drawSuggestion();
+    findSuggestion();
     let data;
     try {
       data = await loadTimes(current);
@@ -776,6 +814,7 @@
           <label>${t('theme')}
             <select data-setting="theme"><option value="auto">${t('theme_auto')}</option><option value="light">${t('theme_light')}</option><option value="dark">${t('theme_dark')}</option></select></label>
           <label class="check"><input type="checkbox" data-setting="extra"> ${t('extra')}</label>
+          <label class="check"><input type="checkbox" data-setting="suggest"> ${t('suggest_gps')}</label>
         </div>
         <div class="card">
           <div class="card-head"><h2>${t('world_calc')}</h2></div>
@@ -857,4 +896,7 @@
   applyTheme();
   applyLang();
   route();
+  if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(() => { /* offline support is optional */ });
+  window.addEventListener('offline', () => toast(t('offline_note')));
+  window.addEventListener('online', () => toast(t('online_note')));
 })();
