@@ -125,6 +125,11 @@
       src_osm: 'Carian tempat: OpenStreetMap Nominatim',
       home_tip: 'Tambahkan halaman ini pada skrin utama telefon anda untuk akses pantas ketika dalam perjalanan.',
       version: 'Versi',
+      why_title: 'Mengapa aplikasi ini dibina',
+      why_1: 'Tujuan utamanya adalah untuk memudahkan anda mendapatkan waktu solat dan arah kiblat dengan pantas, terutamanya ketika bercuti atau dalam perjalanan.',
+      why_2: 'Anda boleh menyimpan beberapa lokasi sebagai kegemaran dan bertukar antara lokasi dengan satu ketikan sahaja.',
+      why_3: 'Aplikasi ini bebas iklan, tidak memerlukan pendaftaran akaun, dan direka supaya mesra pengguna.',
+      feedback: 'Sebarang maklum balas untuk penambahbaikan boleh dihantar melalui e-mel ke',
     },
     en: {
       nav_: 'Prayer times', nav_qibla: 'Qibla', nav_locations: 'Locations', nav_settings: 'Settings', nav_about: 'About',
@@ -183,6 +188,11 @@
       src_osm: 'Place search: OpenStreetMap Nominatim',
       home_tip: 'Add this page to your phone\'s home screen for quick access when travelling.',
       version: 'Version',
+      why_title: 'Why this app was built',
+      why_1: 'Its main purpose is to make prayer times and the qibla direction quick to find, especially while on holiday or travelling.',
+      why_2: 'You can save several locations as favourites and switch between them with a single tap.',
+      why_3: 'The app is ad-free, needs no account, and is designed to be easy to use.',
+      feedback: 'Feedback and suggestions for improvement are welcome by email at',
     },
   };
   const t = (key, ...args) => {
@@ -811,6 +821,15 @@
     app.innerHTML = `
       <div class="page-head"><h1>${t('about_title')}</h1></div>
       <div class="grid cols-2">
+        <div class="card">
+          <div class="card-head"><h2>${t('why_title')}</h2></div>
+          <ul class="list">
+            <li><div class="body">🕌 ${t('why_1')}</div></li>
+            <li><div class="body">⭐ ${t('why_2')}</div></li>
+            <li><div class="body">🚫 ${t('why_3')}</div></li>
+          </ul>
+          <p class="small muted" style="margin:.75rem 0 0">${t('feedback')} <a href="mailto:${esc(DEVELOPER.email)}">${esc(DEVELOPER.email)}</a>.</p>
+        </div>
         <div class="card">
           <p>${t('about_intro')}</p>
           <p class="small muted">${t('home_tip')}</p>
