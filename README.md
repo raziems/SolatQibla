@@ -33,6 +33,10 @@ Everything is stored in the browser (`localStorage`); there is no backend and no
   zone). It never prompts for permission by itself; use "Gunakan kedudukan saya" once and it works from then on.
   Can be turned off in Settings.
 
+- **Install banner** – on iPhone/iPad Safari a dismissable bar explains Share → "Add to Home Screen" (iOS has no
+  install API); on Chrome/Android (and desktop Chrome/Edge) the bar offers a one-tap "Install app" button via
+  `beforeinstallprompt`. Hidden once the app runs standalone; step-by-step instructions live on the About page.
+
 **Releasing:** bump the `?v=` numbers in `public/index.html` *and* `VERSION` + the asset URLs in `public/sw.js`
 together, otherwise installed copies keep the old files.
 
