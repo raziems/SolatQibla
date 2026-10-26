@@ -70,60 +70,60 @@
   const STR = {
     ms: {
       nav_: 'Waktu solat', nav_qibla: 'Kiblat', nav_locations: 'Lokasi', nav_settings: 'Tetapan', nav_about: 'Perihal',
-      error: 'Ada masalah', loading: 'Memuatkan…',
+      error: 'Ralat', loading: 'Memuatkan…',
       loading_times: (l) => `Memuatkan waktu solat untuk ${l}…`,
-      times_unavailable: (e) => `Waktu solat tidak tersedia (${e}). Semak sambungan internet dan cuba lagi.`,
+      times_unavailable: (e) => `Waktu solat tidak tersedia (${e}). Semak sambungan Internet anda dan cuba lagi.`,
       change: 'Tukar', change_location: 'Tukar lokasi',
-      fav_add: 'Simpan sebagai kegemaran', fav_remove: 'Buang daripada kegemaran',
-      fav_saved: 'Disimpan ke kegemaran', fav_removed: 'Dibuang daripada kegemaran',
+      fav_add: 'Simpan sebagai kegemaran', fav_remove: 'Alih keluar daripada kegemaran',
+      fav_saved: 'Disimpan dalam kegemaran', fav_removed: 'Dialih keluar daripada kegemaran',
       next_prayer: 'Solat seterusnya', tomorrow: 'esok', in_: 'dalam',
-      no_times_today: 'Tiada waktu untuk hari ini.',
+      no_times_today: 'Tiada waktu solat untuk hari ini.',
       tz_note: (tz) => `Waktu mengikut zon masa ${tz}`, source: 'Sumber',
-      show_month: 'Papar bulan', hide_month: 'Sembunyi bulan', day: 'Hari',
+      show_month: 'Paparkan bulan', hide_month: 'Sembunyikan bulan', day: 'Hari',
       badge_my: 'JAKIM', badge_world: 'Seluruh dunia',
       finding_qibla: (l) => `Mencari arah kiblat untuk ${l}…`,
       qibla_failed: (e) => `Arah kiblat tidak dapat ditentukan (${e}).`,
-      use_position: '📍 Guna kedudukan saya', my_position: '📍 Kedudukan saya',
-      from_north: 'dari utara sebenar', compass_point: 'mata angin', to_kaaba: 'ke Kaabah',
-      enable_compass: '🧭 Hidupkan kompas', compass_on: '🧭 Kompas hidup',
-      live_hint: 'Pada telefon, dail berpusing mengikut peranti: hadap penanda Kaabah berwarna emas apabila ia berada di atas.',
-      no_live: 'Buka halaman ini pada telefon untuk kompas langsung. Penanda emas menunjukkan arah kiblat berbanding utara sebenar.',
-      bearing_note: 'Arah dikira dari utara sebenar. Kompas magnet mungkin berbeza beberapa darjah bergantung pada lokasi anda.',
+      use_position: '📍 Gunakan kedudukan saya', my_position: '📍 Kedudukan saya',
+      from_north: 'dari utara benar', compass_point: 'mata angin', to_kaaba: 'ke Kaabah',
+      enable_compass: '🧭 Hidupkan kompas', compass_on: '🧭 Kompas dihidupkan',
+      live_hint: 'Pada telefon, dail berputar mengikut peranti: hadapkan telefon ke arah penanda Kaabah berwarna emas sehingga penanda itu berada di bahagian atas.',
+      no_live: 'Buka halaman ini pada telefon untuk menggunakan kompas langsung. Penanda emas menunjukkan arah kiblat berbanding utara benar.',
+      bearing_note: 'Arah dikira dari utara benar. Kompas magnet mungkin berbeza beberapa darjah bergantung pada lokasi anda.',
       compass_denied: 'Kebenaran kompas ditolak', facing: '✓ Anda sedang menghadap Kaabah',
-      turn: (dir, deg) => `Pusing ke ${dir === 'right' ? 'kanan' : 'kiri'} ${deg}°`,
-      compass_off: 'Kompas langsung belum dihidupkan. Tekan "Hidupkan kompas" di bawah, kemudian pegang telefon mendatar: anak panah akan menunjukkan ke arah mana anda perlu berpusing.',
-      compass_denied_hint: 'Kebenaran kompas ditolak. Benarkan akses sensor gerakan untuk laman ini dalam tetapan pelayar, kemudian cuba lagi.',
-      hold_flat: 'Pegang telefon mendatar dan pusing badan sehingga anak panah menghadap ke atas.',
-      no_readings: 'Tiada bacaan kompas lagi. Ini memerlukan telefon dengan magnetometer dan HTTPS.',
+      turn: (dir, deg) => `Pusingkan ke ${dir === 'right' ? 'kanan' : 'kiri'} ${deg}°`,
+      compass_off: 'Kompas langsung belum dihidupkan. Tekan butang "Hidupkan kompas", kemudian pegang telefon secara mendatar. Anak panah akan menunjukkan arah yang perlu anda pusingkan.',
+      compass_denied_hint: 'Kebenaran kompas ditolak. Benarkan akses penderia gerakan untuk laman ini dalam tetapan pelayar, kemudian cuba lagi.',
+      hold_flat: 'Pegang telefon secara mendatar dan pusingkan badan anda sehingga anak panah menghala ke atas.',
+      no_readings: 'Tiada bacaan kompas diterima. Ciri ini memerlukan telefon yang mempunyai magnetometer dan sambungan HTTPS.',
       locations: 'Lokasi', current: 'Semasa', current_badge: 'semasa', favourites: 'Kegemaran',
-      fav_hint: 'Ketik kegemaran untuk menggunakannya. Tekan bintang pada halaman waktu solat untuk menambah lokasi di sini. Kegemaran disimpan dalam pelayar ini.',
-      no_favs: 'Belum ada kegemaran.', rename: 'Namakan semula', move_up: 'Naik ke atas', remove: 'Buang',
+      fav_hint: 'Ketik kegemaran untuk menggunakannya. Tekan bintang pada halaman waktu solat untuk menambahkan lokasi di sini. Kegemaran disimpan dalam pelayar ini.',
+      no_favs: 'Belum ada kegemaran.', rename: 'Namakan semula', move_up: 'Alih ke atas', remove: 'Padam',
       rename_prompt: 'Nama untuk kegemaran ini',
-      where: 'Di mana anda?', gps_hint: 'Di Malaysia, zon JAKIM rasmi dipilih mengikut kedudukan anda; di tempat lain pengiraan seluruh dunia digunakan.',
+      where: 'Di manakah anda?', gps_hint: 'Di Malaysia, zon JAKIM rasmi dipilih mengikut kedudukan anda; di tempat lain, pengiraan seluruh dunia digunakan.',
       search_ph: 'Cari bandar atau tempat, cth. Istanbul, Makkah, London', search: 'Cari', searching: 'Mencari…',
-      no_places: 'Tiada tempat dijumpai.', search_failed: (e) => `Carian gagal (${e})`, setting_location: 'Menetapkan lokasi…',
-      zone_title: 'Malaysia (zon JAKIM)', loading_zones: 'Memuatkan zon…', use_zone: 'Guna zon ini', zones_unavailable: (e) => `Zon tidak tersedia (${e})`,
-      getting_position: 'Mendapatkan kedudukan anda…', location_set: (l) => `Lokasi ditetapkan ke ${l}`,
-      no_geo: 'Pelayar ini tidak menyokong lokasi', geo_denied: 'Kebenaran lokasi ditolak', geo_failed: 'Kedudukan anda tidak dapat diperoleh',
-      no_coords: 'Lokasi tiada koordinat', coords_not_found: (q) => `Koordinat untuk ${q} tidak dijumpai`,
+      no_places: 'Tiada tempat ditemukan.', search_failed: (e) => `Carian gagal (${e})`, setting_location: 'Menetapkan lokasi…',
+      zone_title: 'Malaysia (zon JAKIM)', loading_zones: 'Memuatkan zon…', use_zone: 'Gunakan zon ini', zones_unavailable: (e) => `Zon tidak tersedia (${e})`,
+      getting_position: 'Mendapatkan kedudukan anda…', location_set: (l) => `Lokasi ditetapkan kepada ${l}`,
+      no_geo: 'Pelayar ini tidak menyokong perkhidmatan lokasi', geo_denied: 'Kebenaran lokasi ditolak', geo_failed: 'Kedudukan anda tidak dapat diperoleh',
+      no_coords: 'Lokasi ini tiada koordinat', coords_not_found: (q) => `Koordinat untuk ${q} tidak ditemukan`,
       settings: 'Tetapan', display: 'Paparan', language: 'Bahasa', lang_ms: 'Bahasa Malaysia', lang_en: 'English',
       clock: 'Format masa', clock12: '12 jam (5:45 PG, 7:02 PTG, 8:13 MLM)', clock24: '24 jam (05:45)',
       theme: 'Tema', theme_auto: 'Ikut peranti', theme_light: 'Cerah', theme_dark: 'Gelap',
-      extra: 'Papar juga Imsak dan Dhuha',
-      world_calc: 'Pengiraan seluruh dunia', world_note: 'Digunakan untuk lokasi di luar Malaysia (Aladhan). Zon Malaysia sentiasa menggunakan waktu rasmi JAKIM.',
+      extra: 'Paparkan juga waktu Imsak dan Dhuha',
+      world_calc: 'Pengiraan seluruh dunia', world_note: 'Digunakan untuk lokasi di luar Malaysia (Aladhan). Zon di Malaysia sentiasa menggunakan waktu rasmi JAKIM.',
       method: 'Kaedah pengiraan', method_auto: 'Automatik (mengikut negara)',
-      school: 'Kaedah Asar', school0: 'Piawai (Syafie, Maliki, Hanbali)', school1: 'Hanafi',
-      data: 'Data', data_note: 'Waktu solat disimpan dalam pelayar ini selama 12 jam supaya aplikasi masih berfungsi seketika tanpa talian.',
-      clear_cache: 'Kosongkan cache waktu', reset: 'Set semula semua', reset_confirm: 'Buang kegemaran, tetapan dan data cache?',
+      school: 'Kaedah waktu Asar', school0: 'Piawai (Syafie, Maliki, Hanbali)', school1: 'Hanafi',
+      data: 'Data', data_note: 'Waktu solat disimpan dalam pelayar ini selama 12 jam supaya aplikasi masih dapat digunakan seketika di luar talian.',
+      clear_cache: 'Kosongkan cache waktu solat', reset: 'Set semula semua', reset_confirm: 'Padam kegemaran, tetapan dan data cache?',
       cache_cleared: 'Cache dikosongkan', reset_done: 'Set semula selesai', saved: 'Disimpan',
       about: 'Perihal', about_title: 'Perihal Solat & Qibla', about_more: 'Pembangun dan sumber data',
-      about_intro: 'Waktu solat harian untuk Malaysia (zon JAKIM) dan seluruh dunia, kompas kiblat, dan lokasi kegemaran yang mudah ditukar ketika dalam perjalanan. Semua data disimpan dalam pelayar anda; tiada akaun diperlukan.',
+      about_intro: 'Waktu solat harian untuk Malaysia (zon JAKIM) dan seluruh dunia, kompas kiblat, serta lokasi kegemaran yang mudah ditukar ketika dalam perjalanan. Semua data disimpan dalam pelayar anda; tiada akaun diperlukan.',
       developer: 'Pembangun', email: 'E-mel', sources: 'Sumber data',
       src_jakim: 'Waktu solat Malaysia: JAKIM e-Solat melalui waktusolat.app',
       src_aladhan: 'Waktu solat seluruh dunia: Aladhan API',
       src_ummah: 'Arah kiblat: UmmahAPI (Aladhan sebagai sandaran)',
       src_osm: 'Carian tempat: OpenStreetMap Nominatim',
-      home_tip: 'Tambah halaman ini ke skrin utama telefon untuk akses pantas ketika dalam perjalanan.',
+      home_tip: 'Tambahkan halaman ini pada skrin utama telefon anda untuk akses pantas ketika dalam perjalanan.',
       version: 'Versi',
     },
     en: {
@@ -547,20 +547,22 @@
         <a class="btn sm" href="#/locations">${t('change')}</a>
       </div>
       <div class="qibla-wrap">
+        ${canLive ? `
+        <div class="notice" id="liveNotice">
+          <div id="liveNoticeText">🧭 ${t('compass_off')}</div>
+          <button class="btn primary" id="liveBtn">${t('enable_compass')}</button>
+        </div>
+        <div class="turn" id="turn" hidden>
+          <svg class="turn-arrow" id="turnArrow" viewBox="0 0 100 100" aria-hidden="true"><path d="M50 6 L82 46 L62 46 L62 94 L38 94 L38 46 L18 46 Z"/></svg>
+          <div class="turn-text" id="turnText"></div>
+          <div class="small muted">${t('hold_flat')}</div>
+        </div>` : `<p class="small muted">${t('no_live')}</p>`}
         ${compassSvg(bearing)}
         <div class="qibla-stats">
           <div class="stat"><div class="n">${bearing.toFixed(1)}°</div><div class="l">${t('from_north')}</div></div>
           <div class="stat"><div class="n">${esc(q.compass || toCompass(bearing))}</div><div class="l">${t('compass_point')}</div></div>
           <div class="stat"><div class="n">${q.distanceKm ? Math.round(q.distanceKm).toLocaleString() + ' km' : '—'}</div><div class="l">${t('to_kaaba')}</div></div>
         </div>
-        ${canLive ? `
-        <div class="notice" id="liveNotice">🧭 ${t('compass_off')}</div>
-        <div class="turn" id="turn" hidden>
-          <svg class="turn-arrow" id="turnArrow" viewBox="0 0 100 100" aria-hidden="true"><path d="M50 6 L82 46 L62 46 L62 94 L38 94 L38 46 L18 46 Z"/></svg>
-          <div class="turn-text" id="turnText"></div>
-          <div class="small muted">${t('hold_flat')}</div>
-        </div>
-        <button class="btn primary" id="liveBtn">${t('enable_compass')}</button><p class="small muted" id="liveNote">${t('live_hint')}</p>` : `<p class="small muted">${t('no_live')}</p>`}
         <p class="small muted">${t('bearing_note')}</p>
       </div>`;
     $('#gpsBtn').addEventListener('click', () => useGps(renderQibla));
@@ -608,8 +610,9 @@
       </svg>`;
   }
   async function startLiveCompass(bearing) {
-    const btn = $('#liveBtn'), note = $('#liveNote');
-    const notice = $('#liveNotice'), turn = $('#turn'), arrow = $('#turnArrow'), turnText = $('#turnText');
+    const btn = $('#liveBtn');
+    const notice = $('#liveNotice'), noticeText = $('#liveNoticeText'), turn = $('#turn'), arrow = $('#turnArrow'), turnText = $('#turnText');
+    const showProblem = (msg) => { if (noticeText) noticeText.textContent = `⚠ ${msg}`; if (notice) { notice.hidden = false; notice.classList.add('error'); } };
     try {
       if (typeof DeviceOrientationEvent.requestPermission === 'function') {
         const p = await DeviceOrientationEvent.requestPermission();
@@ -617,7 +620,7 @@
       }
     } catch (e) {
       toast(e.message, true);
-      if (notice) { notice.textContent = `⚠ ${t('compass_denied_hint')}`; notice.classList.add('error'); }
+      showProblem(t('compass_denied_hint'));
       return;
     }
     let got = false, aligned = false;
@@ -643,7 +646,7 @@
     if ('ondeviceorientationabsolute' in window) window.addEventListener('deviceorientationabsolute', orientationHandler);
     else window.addEventListener('deviceorientation', orientationHandler);
     btn.disabled = true; btn.textContent = t('compass_on');
-    setTimeout(() => { if (!got) { if (note) note.textContent = t('no_readings'); if (notice) { notice.textContent = `⚠ ${t('no_readings')}`; notice.classList.add('error'); } } }, 3000);
+    setTimeout(() => { if (!got) showProblem(t('no_readings')); }, 3000);
   }
 
   /* ---------- page: locations ---------- */
