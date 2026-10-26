@@ -102,6 +102,7 @@ p { margin: 0 0 .75rem; }
 .nav a { padding: .4rem .75rem; border-radius: 8px; color: var(--muted); font-weight: 500; white-space: nowrap; }
 .nav a:hover { background: var(--surface-2); text-decoration: none; color: var(--text); }
 .nav a.active { background: var(--primary-soft); color: var(--primary); }
+.nav .ic { display: none; }
 
 /* ---------- layout ---------- */
 .app { max-width: 960px; width: 100%; margin: 0 auto; padding: 1.25rem 1rem 2rem; flex: 1; }
@@ -274,9 +275,28 @@ table.month tr.friday td:first-child { color: var(--primary); }
 }
 .toast.err { background: var(--danger); color: #fff; }
 
-/* ---------- mobile ---------- */
+/* ---------- mobile: bottom tab bar ---------- */
 @media (max-width: 640px) {
-  .topbar { flex-wrap: wrap; height: auto; padding: .5rem 1rem; gap: .5rem; }
-  .nav { order: 3; flex: 0 0 100%; }
+  .topbar { height: 52px; }
+  .nav {
+    position: fixed; left: 0; right: 0; bottom: 0; z-index: 30;
+    display: flex; gap: 0; overflow: visible;
+    background: var(--surface); border-top: 1px solid var(--border);
+    padding: .3rem 0 calc(.3rem + env(safe-area-inset-bottom));
+    box-shadow: 0 -2px 10px rgba(0, 0, 0, .08);
+  }
+  .nav a {
+    flex: 1 1 0; display: flex; flex-direction: column; align-items: center; gap: .1rem;
+    padding: .25rem 0; border-radius: 10px; font-size: .7rem; font-weight: 600; letter-spacing: .01em;
+    color: var(--muted); min-width: 0;
+  }
+  .nav a:hover { background: transparent; }
+  .nav .ic { display: block; font-size: 1.35rem; line-height: 1.2; }
+  .nav .lbl { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 100%; }
+  .nav a.active { background: transparent; color: var(--primary); }
+  .nav a.active .ic { transform: translateY(-1px); }
+  .app { padding-bottom: 1rem; }
+  .foot { padding-bottom: calc(4.6rem + env(safe-area-inset-bottom)); }
+  .toast { bottom: calc(4.6rem + env(safe-area-inset-bottom)); }
   .next-box .n-name, .next-box .n-time { font-size: 1.35rem; }
 }

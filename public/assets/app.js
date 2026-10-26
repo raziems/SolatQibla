@@ -107,7 +107,7 @@
       no_geo: 'Pelayar ini tidak menyokong lokasi', geo_denied: 'Kebenaran lokasi ditolak', geo_failed: 'Kedudukan anda tidak dapat diperoleh',
       no_coords: 'Lokasi tiada koordinat', coords_not_found: (q) => `Koordinat untuk ${q} tidak dijumpai`,
       settings: 'Tetapan', display: 'Paparan', language: 'Bahasa', lang_ms: 'Bahasa Malaysia', lang_en: 'English',
-      clock: 'Format masa', clock12: '12 jam (5:45 AM)', clock24: '24 jam (05:45)',
+      clock: 'Format masa', clock12: '12 jam (5:45 PG, 7:02 PTG, 8:13 MLM)', clock24: '24 jam (05:45)',
       theme: 'Tema', theme_auto: 'Ikut peranti', theme_light: 'Cerah', theme_dark: 'Gelap',
       extra: 'Papar juga Imsak dan Dhuha',
       world_calc: 'Pengiraan seluruh dunia', world_note: 'Digunakan untuk lokasi di luar Malaysia (Aladhan). Zon Malaysia sentiasa menggunakan waktu rasmi JAKIM.',
@@ -116,7 +116,7 @@
       data: 'Data', data_note: 'Waktu solat disimpan dalam pelayar ini selama 12 jam supaya aplikasi masih berfungsi seketika tanpa talian.',
       clear_cache: 'Kosongkan cache waktu', reset: 'Set semula semua', reset_confirm: 'Buang kegemaran, tetapan dan data cache?',
       cache_cleared: 'Cache dikosongkan', reset_done: 'Set semula selesai', saved: 'Disimpan',
-      about: 'Perihal', about_title: 'Perihal Solat & Qibla',
+      about: 'Perihal', about_title: 'Perihal Solat & Qibla', about_more: 'Pembangun dan sumber data',
       about_intro: 'Waktu solat harian untuk Malaysia (zon JAKIM) dan seluruh dunia, kompas kiblat, dan lokasi kegemaran yang mudah ditukar ketika dalam perjalanan. Semua data disimpan dalam pelayar anda; tiada akaun diperlukan.',
       developer: 'Pembangun', email: 'E-mel', sources: 'Sumber data',
       src_jakim: 'Waktu solat Malaysia: JAKIM e-Solat melalui waktusolat.app',
@@ -174,7 +174,7 @@
       data: 'Data', data_note: 'Prayer times are cached in this browser for 12 hours so the app also works briefly offline.',
       clear_cache: 'Clear cached times', reset: 'Reset everything', reset_confirm: 'Remove favourites, settings and cached data?',
       cache_cleared: 'Cache cleared', reset_done: 'Reset done', saved: 'Saved',
-      about: 'About', about_title: 'About Solat & Qibla',
+      about: 'About', about_title: 'About Solat & Qibla', about_more: 'Developer and data sources',
       about_intro: 'Daily prayer times for Malaysia (JAKIM zones) and worldwide, a qibla compass, and favourite locations that are easy to switch while travelling. Everything is stored in your browser; no account needed.',
       developer: 'Developer', email: 'Email', sources: 'Data sources',
       src_jakim: 'Malaysia prayer times: JAKIM e-Solat via waktusolat.app',
@@ -222,7 +222,7 @@
   }
   function applyLang() {
     document.documentElement.lang = settings.lang;
-    $$('#nav a').forEach((a) => { a.textContent = t('nav_' + a.dataset.route); });
+    $$('#nav a').forEach((a) => { const l = $('.lbl', a) || a; l.textContent = t('nav_' + a.dataset.route); });
     const fa = $('#footAbout'); if (fa) fa.textContent = t('about');
   }
 
@@ -263,7 +263,17 @@
   const dateKey = (ms, tz) => new Intl.DateTimeFormat('en-CA', { timeZone: tz, year: 'numeric', month: '2-digit', day: '2-digit' }).format(new Date(ms));
   const ymd = (key) => key.split('-').map(Number);
   function addDays(key, n) { const [y, m, d] = ymd(key); const dt = new Date(Date.UTC(y, m - 1, d + n)); return `${dt.getUTCFullYear()}-${pad(dt.getUTCMonth() + 1)}-${pad(dt.getUTCDate())}`; }
-  const fmtTime = (ms, tz) => new Date(ms).toLocaleTimeString(settings.clock === '12' ? 'en-US' : 'en-GB', { hour: '2-digit', minute: '2-digit', hour12: settings.clock === '12', timeZone: tz });
+  /* 12-hour times in Bahasa Malaysia use PG (pagi), PTG (petang) and MLM (malam) instead of AM/PM. */
+  function fmtTime(ms, tz) {
+    const d = new Date(ms);
+    if (settings.clock !== '12') return d.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', hour12: false, timeZone: tz });
+    if (settings.lang !== 'ms') return d.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true, timeZone: tz });
+    const parts = Object.fromEntries(new Intl.DateTimeFormat('en-GB', { hour: '2-digit', minute: '2-digit', hourCycle: 'h23', timeZone: tz }).formatToParts(d).map((p) => [p.type, p.value]));
+    const h24 = Number(parts.hour);
+    const h12 = h24 % 12 === 0 ? 12 : h24 % 12;
+    const suffix = h24 < 12 ? 'PG' : h24 < 19 ? 'PTG' : 'MLM';
+    return `${pad(h12)}:${parts.minute} ${suffix}`;
+  }
   const fmtDate = (ms, tz) => new Date(ms).toLocaleDateString(dateLocale(), { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric', timeZone: tz });
   const deviceTz = Intl.DateTimeFormat().resolvedOptions().timeZone;
   const names = () => NAMES[settings.lang] || NAMES.ms;
@@ -767,6 +777,11 @@
           <p class="small muted">${t('data_note')}</p>
           <button class="btn" id="clearCache">${t('clear_cache')}</button>
           <button class="btn danger" id="resetAll">${t('reset')}</button>
+        </div>
+        <div class="card">
+          <div class="card-head"><h2>${t('about')}</h2></div>
+          <p class="small muted">${t('about_intro')}</p>
+          <a class="btn" href="#/about">${t('about_more')}</a>
         </div>
       </div>`;
     $$('[data-setting]').forEach((el) => {
