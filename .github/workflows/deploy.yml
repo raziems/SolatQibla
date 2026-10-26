@@ -7,6 +7,7 @@
 #              was added as an add-on domain to an account that already hosts another site)
 #
 # scripts/set-github-secrets.ps1 can create the two secrets for you.
+# Until the secrets exist the upload step is skipped and the run stays green.
 name: Deploy to InfinityFree
 
 on:
@@ -21,6 +22,9 @@ concurrency:
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    env:
+      FTP_USERNAME: ${{ secrets.FTP_USERNAME }}
+      FTP_PASSWORD: ${{ secrets.FTP_PASSWORD }}
     steps:
       - name: Check out
         uses: actions/checkout@v4
@@ -28,7 +32,13 @@ jobs:
       - name: Syntax check the front end
         run: node --check public/assets/app.js
 
+      - name: Secrets missing?
+        if: env.FTP_USERNAME == '' || env.FTP_PASSWORD == ''
+        run: |
+          echo "::warning::FTP_USERNAME / FTP_PASSWORD secrets are not set — skipping the upload. See README → Deploy to InfinityFree."
+
       - name: Upload via FTP
+        if: env.FTP_USERNAME != '' && env.FTP_PASSWORD != ''
         uses: SamKirkland/FTP-Deploy-Action@v4.3.5
         with:
           server: ftpupload.net
