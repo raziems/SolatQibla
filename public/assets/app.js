@@ -91,6 +91,9 @@
       bearing_note: 'Arah dikira dari utara sebenar. Kompas magnet mungkin berbeza beberapa darjah bergantung pada lokasi anda.',
       compass_denied: 'Kebenaran kompas ditolak', facing: '✓ Anda sedang menghadap Kaabah',
       turn: (dir, deg) => `Pusing ke ${dir === 'right' ? 'kanan' : 'kiri'} ${deg}°`,
+      compass_off: 'Kompas langsung belum dihidupkan. Tekan "Hidupkan kompas" di bawah, kemudian pegang telefon mendatar: anak panah akan menunjukkan ke arah mana anda perlu berpusing.',
+      compass_denied_hint: 'Kebenaran kompas ditolak. Benarkan akses sensor gerakan untuk laman ini dalam tetapan pelayar, kemudian cuba lagi.',
+      hold_flat: 'Pegang telefon mendatar dan pusing badan sehingga anak panah menghadap ke atas.',
       no_readings: 'Tiada bacaan kompas lagi. Ini memerlukan telefon dengan magnetometer dan HTTPS.',
       locations: 'Lokasi', current: 'Semasa', current_badge: 'semasa', favourites: 'Kegemaran',
       fav_hint: 'Ketik kegemaran untuk menggunakannya. Tekan bintang pada halaman waktu solat untuk menambah lokasi di sini. Kegemaran disimpan dalam pelayar ini.',
@@ -104,7 +107,7 @@
       no_geo: 'Pelayar ini tidak menyokong lokasi', geo_denied: 'Kebenaran lokasi ditolak', geo_failed: 'Kedudukan anda tidak dapat diperoleh',
       no_coords: 'Lokasi tiada koordinat', coords_not_found: (q) => `Koordinat untuk ${q} tidak dijumpai`,
       settings: 'Tetapan', display: 'Paparan', language: 'Bahasa', lang_ms: 'Bahasa Malaysia', lang_en: 'English',
-      clock: 'Format masa', clock12: '12 jam (5:45 AM)', clock24: '24 jam (05:45)',
+      clock: 'Format masa', clock12: '12 jam (5:45 PG, 7:02 PTG, 8:13 MLM)', clock24: '24 jam (05:45)',
       theme: 'Tema', theme_auto: 'Ikut peranti', theme_light: 'Cerah', theme_dark: 'Gelap',
       extra: 'Papar juga Imsak dan Dhuha',
       world_calc: 'Pengiraan seluruh dunia', world_note: 'Digunakan untuk lokasi di luar Malaysia (Aladhan). Zon Malaysia sentiasa menggunakan waktu rasmi JAKIM.',
@@ -113,7 +116,7 @@
       data: 'Data', data_note: 'Waktu solat disimpan dalam pelayar ini selama 12 jam supaya aplikasi masih berfungsi seketika tanpa talian.',
       clear_cache: 'Kosongkan cache waktu', reset: 'Set semula semua', reset_confirm: 'Buang kegemaran, tetapan dan data cache?',
       cache_cleared: 'Cache dikosongkan', reset_done: 'Set semula selesai', saved: 'Disimpan',
-      about: 'Perihal', about_title: 'Perihal Solat & Qibla',
+      about: 'Perihal', about_title: 'Perihal Solat & Qibla', about_more: 'Pembangun dan sumber data',
       about_intro: 'Waktu solat harian untuk Malaysia (zon JAKIM) dan seluruh dunia, kompas kiblat, dan lokasi kegemaran yang mudah ditukar ketika dalam perjalanan. Semua data disimpan dalam pelayar anda; tiada akaun diperlukan.',
       developer: 'Pembangun', email: 'E-mel', sources: 'Sumber data',
       src_jakim: 'Waktu solat Malaysia: JAKIM e-Solat melalui waktusolat.app',
@@ -146,6 +149,9 @@
       bearing_note: 'Bearing is relative to true north. Magnetic compasses can differ by a few degrees depending on where you are.',
       compass_denied: 'Compass permission was denied', facing: '✓ You are facing the Kaaba',
       turn: (dir, deg) => `Turn ${dir} ${deg}°`,
+      compass_off: 'The live compass is off. Tap "Enable live compass" below, then hold the phone flat: the arrow will show which way to turn.',
+      compass_denied_hint: 'Compass permission was denied. Allow motion sensor access for this site in your browser settings, then try again.',
+      hold_flat: 'Hold the phone flat and turn your body until the arrow points straight up.',
       no_readings: 'No compass readings yet. This needs a phone with a magnetometer and HTTPS.',
       locations: 'Locations', current: 'Current', current_badge: 'current', favourites: 'Favourites',
       fav_hint: 'Tap a favourite to use it. Star a location on the prayer times page to add it here. Favourites are stored in this browser.',
@@ -168,7 +174,7 @@
       data: 'Data', data_note: 'Prayer times are cached in this browser for 12 hours so the app also works briefly offline.',
       clear_cache: 'Clear cached times', reset: 'Reset everything', reset_confirm: 'Remove favourites, settings and cached data?',
       cache_cleared: 'Cache cleared', reset_done: 'Reset done', saved: 'Saved',
-      about: 'About', about_title: 'About Solat & Qibla',
+      about: 'About', about_title: 'About Solat & Qibla', about_more: 'Developer and data sources',
       about_intro: 'Daily prayer times for Malaysia (JAKIM zones) and worldwide, a qibla compass, and favourite locations that are easy to switch while travelling. Everything is stored in your browser; no account needed.',
       developer: 'Developer', email: 'Email', sources: 'Data sources',
       src_jakim: 'Malaysia prayer times: JAKIM e-Solat via waktusolat.app',
@@ -216,7 +222,7 @@
   }
   function applyLang() {
     document.documentElement.lang = settings.lang;
-    $$('#nav a').forEach((a) => { a.textContent = t('nav_' + a.dataset.route); });
+    $$('#nav a').forEach((a) => { const l = $('.lbl', a) || a; l.textContent = t('nav_' + a.dataset.route); });
     const fa = $('#footAbout'); if (fa) fa.textContent = t('about');
   }
 
@@ -257,7 +263,17 @@
   const dateKey = (ms, tz) => new Intl.DateTimeFormat('en-CA', { timeZone: tz, year: 'numeric', month: '2-digit', day: '2-digit' }).format(new Date(ms));
   const ymd = (key) => key.split('-').map(Number);
   function addDays(key, n) { const [y, m, d] = ymd(key); const dt = new Date(Date.UTC(y, m - 1, d + n)); return `${dt.getUTCFullYear()}-${pad(dt.getUTCMonth() + 1)}-${pad(dt.getUTCDate())}`; }
-  const fmtTime = (ms, tz) => new Date(ms).toLocaleTimeString(settings.clock === '12' ? 'en-US' : 'en-GB', { hour: '2-digit', minute: '2-digit', hour12: settings.clock === '12', timeZone: tz });
+  /* 12-hour times in Bahasa Malaysia use PG (pagi), PTG (petang) and MLM (malam) instead of AM/PM. */
+  function fmtTime(ms, tz) {
+    const d = new Date(ms);
+    if (settings.clock !== '12') return d.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', hour12: false, timeZone: tz });
+    if (settings.lang !== 'ms') return d.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true, timeZone: tz });
+    const parts = Object.fromEntries(new Intl.DateTimeFormat('en-GB', { hour: '2-digit', minute: '2-digit', hourCycle: 'h23', timeZone: tz }).formatToParts(d).map((p) => [p.type, p.value]));
+    const h24 = Number(parts.hour);
+    const h12 = h24 % 12 === 0 ? 12 : h24 % 12;
+    const suffix = h24 < 12 ? 'PG' : h24 < 19 ? 'PTG' : 'MLM';
+    return `${pad(h12)}:${parts.minute} ${suffix}`;
+  }
   const fmtDate = (ms, tz) => new Date(ms).toLocaleDateString(dateLocale(), { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric', timeZone: tz });
   const deviceTz = Intl.DateTimeFormat().resolvedOptions().timeZone;
   const names = () => NAMES[settings.lang] || NAMES.ms;
@@ -537,7 +553,14 @@
           <div class="stat"><div class="n">${esc(q.compass || toCompass(bearing))}</div><div class="l">${t('compass_point')}</div></div>
           <div class="stat"><div class="n">${q.distanceKm ? Math.round(q.distanceKm).toLocaleString() + ' km' : '—'}</div><div class="l">${t('to_kaaba')}</div></div>
         </div>
-        ${canLive ? `<button class="btn primary" id="liveBtn">${t('enable_compass')}</button><p class="small muted" id="liveNote">${t('live_hint')}</p>` : `<p class="small muted">${t('no_live')}</p>`}
+        ${canLive ? `
+        <div class="notice" id="liveNotice">🧭 ${t('compass_off')}</div>
+        <div class="turn" id="turn" hidden>
+          <svg class="turn-arrow" id="turnArrow" viewBox="0 0 100 100" aria-hidden="true"><path d="M50 6 L82 46 L62 46 L62 94 L38 94 L38 46 L18 46 Z"/></svg>
+          <div class="turn-text" id="turnText"></div>
+          <div class="small muted">${t('hold_flat')}</div>
+        </div>
+        <button class="btn primary" id="liveBtn">${t('enable_compass')}</button><p class="small muted" id="liveNote">${t('live_hint')}</p>` : `<p class="small muted">${t('no_live')}</p>`}
         <p class="small muted">${t('bearing_note')}</p>
       </div>`;
     $('#gpsBtn').addEventListener('click', () => useGps(renderQibla));
@@ -586,12 +609,17 @@
   }
   async function startLiveCompass(bearing) {
     const btn = $('#liveBtn'), note = $('#liveNote');
+    const notice = $('#liveNotice'), turn = $('#turn'), arrow = $('#turnArrow'), turnText = $('#turnText');
     try {
       if (typeof DeviceOrientationEvent.requestPermission === 'function') {
         const p = await DeviceOrientationEvent.requestPermission();
         if (p !== 'granted') throw new Error(t('compass_denied'));
       }
-    } catch (e) { toast(e.message, true); return; }
+    } catch (e) {
+      toast(e.message, true);
+      if (notice) { notice.textContent = `⚠ ${t('compass_denied_hint')}`; notice.classList.add('error'); }
+      return;
+    }
     let got = false, aligned = false;
     orientationHandler = (ev) => {
       let heading = null;
@@ -599,7 +627,7 @@
       else if (ev.absolute && typeof ev.alpha === 'number') heading = (360 - ev.alpha) % 360; // Android
       else if (typeof ev.alpha === 'number' && ev.type === 'deviceorientationabsolute') heading = (360 - ev.alpha) % 360;
       if (heading === null) return;
-      got = true;
+      if (!got) { got = true; if (notice) notice.hidden = true; if (turn) turn.hidden = false; }
       const dial = $('#dial');
       if (dial) dial.style.transform = `rotate(${-heading}deg)`;
       const diff = ((bearing - heading + 540) % 360) - 180;
@@ -607,12 +635,15 @@
       aligned = Math.abs(diff) < (aligned ? 7 : 5);
       $('#qibla')?.classList.toggle('aligned', aligned);
       $('.compass')?.classList.toggle('aligned', aligned);
-      if (note) note.innerHTML = aligned ? `<span class="live-on">${t('facing')}</span>` : esc(t('turn', diff > 0 ? 'right' : 'left', Math.abs(Math.round(diff))));
+      // big arrow: points toward the Kaaba relative to the top of the phone
+      if (arrow) { arrow.style.transform = `rotate(${diff}deg)`; arrow.classList.toggle('aligned', aligned); }
+      const msg = aligned ? `<span class="live-on">${t('facing')}</span>` : `${diff > 0 ? '↻' : '↺'} ${esc(t('turn', diff > 0 ? 'right' : 'left', Math.abs(Math.round(diff))))}`;
+      if (turnText) turnText.innerHTML = msg;
     };
     if ('ondeviceorientationabsolute' in window) window.addEventListener('deviceorientationabsolute', orientationHandler);
     else window.addEventListener('deviceorientation', orientationHandler);
     btn.disabled = true; btn.textContent = t('compass_on');
-    setTimeout(() => { if (!got && note) note.textContent = t('no_readings'); }, 3000);
+    setTimeout(() => { if (!got) { if (note) note.textContent = t('no_readings'); if (notice) { notice.textContent = `⚠ ${t('no_readings')}`; notice.classList.add('error'); } } }, 3000);
   }
 
   /* ---------- page: locations ---------- */
@@ -746,6 +777,11 @@
           <p class="small muted">${t('data_note')}</p>
           <button class="btn" id="clearCache">${t('clear_cache')}</button>
           <button class="btn danger" id="resetAll">${t('reset')}</button>
+        </div>
+        <div class="card">
+          <div class="card-head"><h2>${t('about')}</h2></div>
+          <p class="small muted">${t('about_intro')}</p>
+          <a class="btn" href="#/about">${t('about_more')}</a>
         </div>
       </div>`;
     $$('[data-setting]').forEach((el) => {
