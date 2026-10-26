@@ -243,9 +243,11 @@ table.month tr.friday td:first-child { color: var(--primary); }
 .stat .l { font-size: .72rem; color: var(--muted); text-transform: uppercase; letter-spacing: .04em; }
 .live-on { color: var(--success); font-weight: 600; }
 .notice {
-  width: 100%; max-width: 520px; padding: .7rem .9rem; border-radius: 10px; font-size: .9rem; line-height: 1.4;
+  display: flex; flex-direction: column; align-items: flex-start; gap: .6rem;
+  width: 100%; max-width: 520px; padding: .8rem .9rem; border-radius: 10px; font-size: .95rem; line-height: 1.45;
   background: var(--warning-soft); color: var(--warning); border: 1px solid color-mix(in srgb, var(--warning) 35%, transparent);
 }
+.notice .btn { align-self: stretch; justify-content: center; }
 .notice.error { background: var(--danger-soft); color: var(--danger); border-color: color-mix(in srgb, var(--danger) 35%, transparent); }
 .turn { display: flex; flex-direction: column; align-items: center; gap: .35rem; text-align: center; }
 .turn-arrow { width: 110px; height: 110px; fill: var(--primary); transition: transform .25s ease-out, fill .4s; filter: drop-shadow(0 2px 4px rgba(0, 0, 0, .25)); }
@@ -299,4 +301,6 @@ table.month tr.friday td:first-child { color: var(--primary); }
   .foot { padding-bottom: calc(4.6rem + env(safe-area-inset-bottom)); }
   .toast { bottom: calc(4.6rem + env(safe-area-inset-bottom)); }
   .next-box .n-name, .next-box .n-time { font-size: 1.35rem; }
+  .compass { width: min(260px, 68vw); }
+  .turn-arrow { width: 96px; height: 96px; }
 }
