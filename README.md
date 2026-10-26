@@ -2,7 +2,7 @@
 
 Prayer times and a qibla compass, built for free static hosting at InfinityFree.
 
-Live site: https://raziems.free.nf/
+Live site: https://solat.site.je/
 
 - **Prayer times** – the same widget as TeamBoard, grown into a page: next prayer with a live countdown,
   today's six times, Hijri date, and a collapsible monthly table.
@@ -61,11 +61,13 @@ node scripts/serve.js
 
 Then open http://localhost:5173/. No dependencies, no build step.
 
-## Deploy to InfinityFree (raziems.free.nf)
+## Deploy to InfinityFree (solat.site.je)
 
-The GitHub Action uploads `public/` over FTP on every push to `main`.
+The GitHub Action uploads `public/` over FTP on every push to `main`. The site lives on the same hosting
+account as TeamBoard (`raziems.site.je`), so `solat.site.je` is an add-on domain there and its files go to
+`/solat.site.je/htdocs/`, never to the account's root `/htdocs/`.
 
-1. In the InfinityFree client area open the hosting account that serves `raziems.free.nf` → **FTP Details**.
+1. In the InfinityFree client area open the hosting account that serves `solat.site.je` → **FTP Details**.
    Note the FTP username (`if0_XXXXXXXX`) and the hosting account password.
 2. Add them as GitHub Actions secrets (`FTP_USERNAME`, `FTP_PASSWORD`), either in
    *Settings → Secrets and variables → Actions* or with:
@@ -73,9 +75,12 @@ The GitHub Action uploads `public/` over FTP on every push to `main`.
    powershell -ExecutionPolicy Bypass -File scripts\set-github-secrets.ps1 -FtpUsername if0_XXXXXXXX
    ```
    (the script prompts for the password and never prints it).
-3. If `raziems.free.nf` is an **add-on domain** on an account that already hosts another site, add an Actions
-   *variable* `FTP_SERVER_DIR` = `/raziems.free.nf/htdocs/`. Leave it unset when it is the account's main domain.
+3. Add an Actions *variable* `FTP_SERVER_DIR` = `/solat.site.je/htdocs/` (already set on this repo). Leave it
+   unset only if the site ever becomes the account's main domain.
 4. Push to `main` (or run the workflow manually from the Actions tab).
+
+To move the site to another domain later: add the domain to the hosting account in the InfinityFree control panel,
+change `FTP_SERVER_DIR` to `/<new-domain>/htdocs/`, and re-run the workflow.
 
 ## Data sources
 
