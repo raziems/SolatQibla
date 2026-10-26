@@ -172,6 +172,14 @@ label.check { display: flex; align-items: center; font-weight: 500; color: var(-
 .badge.world { background: var(--warning-soft); color: var(--warning); }
 .badge.current { background: var(--success-soft); color: var(--success); }
 
+/* ---------- GPS suggestion bar ---------- */
+.suggest {
+  display: flex; align-items: center; gap: .5rem; flex-wrap: wrap; margin-bottom: 1rem;
+  padding: .6rem .9rem; border-radius: 10px; font-weight: 500;
+  background: var(--primary-soft); color: var(--primary); border: 1px solid color-mix(in srgb, var(--primary) 35%, transparent);
+}
+.suggest .spacer { flex: 1; }
+
 /* ---------- favourites chips ---------- */
 .chips { display: flex; gap: .4rem; flex-wrap: wrap; margin-bottom: 1rem; }
 .chip {

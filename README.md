@@ -23,8 +23,18 @@ Live site: https://solat.site.je/
   Dhuha.
 - **About** – developer contact and data-source credits.
 
-Everything is stored in the browser (`localStorage`); there is no backend and no account. Responses are cached for
-12 hours so the page keeps working for a while without a connection.
+Everything is stored in the browser (`localStorage`); there is no backend and no account.
+
+- **Works offline** – a service worker (`public/sw.js`) caches the app shell, and prayer times / qibla answers are
+  kept in `localStorage` (12 hours, served stale when the network is down), so the page opens and shows the current
+  month even with no connection. Installable on the home screen with proper PNG icons (iOS needs PNG, not SVG).
+- **"Are you in …?"** – when the browser already has location permission, the prayer-times page quietly checks GPS on
+  load and offers a one-tap switch if you are more than 50 km from the current location (or in a different JAKIM
+  zone). It never prompts for permission by itself; use "Gunakan kedudukan saya" once and it works from then on.
+  Can be turned off in Settings.
+
+**Releasing:** bump the `?v=` numbers in `public/index.html` *and* `VERSION` + the asset URLs in `public/sw.js`
+together, otherwise installed copies keep the old files.
 
 ## Why Aladhan and not IslamicAPI?
 
