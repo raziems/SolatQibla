@@ -1,10 +1,10 @@
 /* Service worker: makes the app shell available offline.
    Bump VERSION together with the ?v= numbers in index.html on every release. */
-const VERSION = 'v10';
+const VERSION = 'v11';
 const CACHE = `solat-qibla-${VERSION}`;
 const SHELL = [
   './', './index.html',
-  './assets/style.css?v=10', './assets/app.js?v=10',
+  './assets/style.css?v=11', './assets/app.js?v=11',
   './manifest.webmanifest', './icon.svg', './icon-180.png', './icon-192.png', './icon-512.png',
 ];
 

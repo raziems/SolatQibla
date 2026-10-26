@@ -25,9 +25,12 @@ Live site: https://solat.site.je/
 
 Everything is stored in the browser (`localStorage`); there is no backend and no account.
 
-- **Works offline** – a service worker (`public/sw.js`) caches the app shell, and prayer times / qibla answers are
-  kept in `localStorage` (12 hours, served stale when the network is down), so the page opens and shows the current
-  month even with no connection. Installable on the home screen with proper PNG icons (iOS needs PNG, not SVG).
+- **Offline (best effort)** – prayer times and qibla answers are kept in `localStorage` (12 hours, served stale when
+  the network is down). A service worker (`public/sw.js`) would also cache the app shell, but **on InfinityFree it
+  cannot be relied on**: the host's anti-bot check answers the browser's service-worker script request with an HTML
+  challenge page, so registration/updates fail with "unsupported MIME type". The code is kept (harmless when it
+  fails; works on hosts without that check, e.g. GitHub Pages), but the site does not promise offline use.
+  Installable on the home screen with proper PNG icons (iOS needs PNG, not SVG).
 - **"Are you in …?"** – when the browser already has location permission, the prayer-times page quietly checks GPS on
   load and offers a one-tap switch if you are more than 50 km from the current location (or in a different JAKIM
   zone). It never prompts for permission by itself; use "Gunakan kedudukan saya" once and it works from then on.
