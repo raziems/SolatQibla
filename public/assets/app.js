@@ -463,7 +463,7 @@
         if (p !== 'granted') throw new Error('Compass permission was denied');
       }
     } catch (e) { toast(e.message, true); return; }
-    let got = false;
+    let got = false, aligned = false;
     orientationHandler = (ev) => {
       let heading = null;
       if (typeof ev.webkitCompassHeading === 'number') heading = ev.webkitCompassHeading; // iOS
@@ -474,7 +474,11 @@
       const dial = $('#dial');
       if (dial) dial.style.transform = `rotate(${-heading}deg)`;
       const diff = ((bearing - heading + 540) % 360) - 180;
-      if (note) note.innerHTML = Math.abs(diff) < 5 ? '<span class="live-on">✓ You are facing the qibla</span>' : `Turn ${diff > 0 ? 'right' : 'left'} ${Math.abs(Math.round(diff))}°`;
+      // small hysteresis so the colour does not flicker right at the edge
+      aligned = Math.abs(diff) < (aligned ? 7 : 5);
+      $('#qibla')?.classList.toggle('aligned', aligned);
+      $('.compass')?.classList.toggle('aligned', aligned);
+      if (note) note.innerHTML = aligned ? '<span class="live-on">✓ You are facing the Kaaba</span>' : `Turn ${diff > 0 ? 'right' : 'left'} ${Math.abs(Math.round(diff))}°`;
     };
     if ('ondeviceorientationabsolute' in window) window.addEventListener('deviceorientationabsolute', orientationHandler);
     else window.addEventListener('deviceorientation', orientationHandler);
