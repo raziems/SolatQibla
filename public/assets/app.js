@@ -91,6 +91,9 @@
       bearing_note: 'Arah dikira dari utara sebenar. Kompas magnet mungkin berbeza beberapa darjah bergantung pada lokasi anda.',
       compass_denied: 'Kebenaran kompas ditolak', facing: '✓ Anda sedang menghadap Kaabah',
       turn: (dir, deg) => `Pusing ke ${dir === 'right' ? 'kanan' : 'kiri'} ${deg}°`,
+      compass_off: 'Kompas langsung belum dihidupkan. Tekan "Hidupkan kompas" di bawah, kemudian pegang telefon mendatar: anak panah akan menunjukkan ke arah mana anda perlu berpusing.',
+      compass_denied_hint: 'Kebenaran kompas ditolak. Benarkan akses sensor gerakan untuk laman ini dalam tetapan pelayar, kemudian cuba lagi.',
+      hold_flat: 'Pegang telefon mendatar dan pusing badan sehingga anak panah menghadap ke atas.',
       no_readings: 'Tiada bacaan kompas lagi. Ini memerlukan telefon dengan magnetometer dan HTTPS.',
       locations: 'Lokasi', current: 'Semasa', current_badge: 'semasa', favourites: 'Kegemaran',
       fav_hint: 'Ketik kegemaran untuk menggunakannya. Tekan bintang pada halaman waktu solat untuk menambah lokasi di sini. Kegemaran disimpan dalam pelayar ini.',
@@ -146,6 +149,9 @@
       bearing_note: 'Bearing is relative to true north. Magnetic compasses can differ by a few degrees depending on where you are.',
       compass_denied: 'Compass permission was denied', facing: '✓ You are facing the Kaaba',
       turn: (dir, deg) => `Turn ${dir} ${deg}°`,
+      compass_off: 'The live compass is off. Tap "Enable live compass" below, then hold the phone flat: the arrow will show which way to turn.',
+      compass_denied_hint: 'Compass permission was denied. Allow motion sensor access for this site in your browser settings, then try again.',
+      hold_flat: 'Hold the phone flat and turn your body until the arrow points straight up.',
       no_readings: 'No compass readings yet. This needs a phone with a magnetometer and HTTPS.',
       locations: 'Locations', current: 'Current', current_badge: 'current', favourites: 'Favourites',
       fav_hint: 'Tap a favourite to use it. Star a location on the prayer times page to add it here. Favourites are stored in this browser.',
@@ -537,7 +543,14 @@
           <div class="stat"><div class="n">${esc(q.compass || toCompass(bearing))}</div><div class="l">${t('compass_point')}</div></div>
           <div class="stat"><div class="n">${q.distanceKm ? Math.round(q.distanceKm).toLocaleString() + ' km' : '—'}</div><div class="l">${t('to_kaaba')}</div></div>
         </div>
-        ${canLive ? `<button class="btn primary" id="liveBtn">${t('enable_compass')}</button><p class="small muted" id="liveNote">${t('live_hint')}</p>` : `<p class="small muted">${t('no_live')}</p>`}
+        ${canLive ? `
+        <div class="notice" id="liveNotice">🧭 ${t('compass_off')}</div>
+        <div class="turn" id="turn" hidden>
+          <svg class="turn-arrow" id="turnArrow" viewBox="0 0 100 100" aria-hidden="true"><path d="M50 6 L82 46 L62 46 L62 94 L38 94 L38 46 L18 46 Z"/></svg>
+          <div class="turn-text" id="turnText"></div>
+          <div class="small muted">${t('hold_flat')}</div>
+        </div>
+        <button class="btn primary" id="liveBtn">${t('enable_compass')}</button><p class="small muted" id="liveNote">${t('live_hint')}</p>` : `<p class="small muted">${t('no_live')}</p>`}
         <p class="small muted">${t('bearing_note')}</p>
       </div>`;
     $('#gpsBtn').addEventListener('click', () => useGps(renderQibla));
@@ -586,12 +599,17 @@
   }
   async function startLiveCompass(bearing) {
     const btn = $('#liveBtn'), note = $('#liveNote');
+    const notice = $('#liveNotice'), turn = $('#turn'), arrow = $('#turnArrow'), turnText = $('#turnText');
     try {
       if (typeof DeviceOrientationEvent.requestPermission === 'function') {
         const p = await DeviceOrientationEvent.requestPermission();
         if (p !== 'granted') throw new Error(t('compass_denied'));
       }
-    } catch (e) { toast(e.message, true); return; }
+    } catch (e) {
+      toast(e.message, true);
+      if (notice) { notice.textContent = `⚠ ${t('compass_denied_hint')}`; notice.classList.add('error'); }
+      return;
+    }
     let got = false, aligned = false;
     orientationHandler = (ev) => {
       let heading = null;
@@ -599,7 +617,7 @@
       else if (ev.absolute && typeof ev.alpha === 'number') heading = (360 - ev.alpha) % 360; // Android
       else if (typeof ev.alpha === 'number' && ev.type === 'deviceorientationabsolute') heading = (360 - ev.alpha) % 360;
       if (heading === null) return;
-      got = true;
+      if (!got) { got = true; if (notice) notice.hidden = true; if (turn) turn.hidden = false; }
       const dial = $('#dial');
       if (dial) dial.style.transform = `rotate(${-heading}deg)`;
       const diff = ((bearing - heading + 540) % 360) - 180;
@@ -607,12 +625,16 @@
       aligned = Math.abs(diff) < (aligned ? 7 : 5);
       $('#qibla')?.classList.toggle('aligned', aligned);
       $('.compass')?.classList.toggle('aligned', aligned);
-      if (note) note.innerHTML = aligned ? `<span class="live-on">${t('facing')}</span>` : esc(t('turn', diff > 0 ? 'right' : 'left', Math.abs(Math.round(diff))));
+      // big arrow: points toward the Kaaba relative to the top of the phone
+      if (arrow) { arrow.style.transform = `rotate(${diff}deg)`; arrow.classList.toggle('aligned', aligned); }
+      const msg = aligned ? `<span class="live-on">${t('facing')}</span>` : `${diff > 0 ? '↻' : '↺'} ${esc(t('turn', diff > 0 ? 'right' : 'left', Math.abs(Math.round(diff))))}`;
+      if (turnText) turnText.innerHTML = msg;
+      if (note) note.innerHTML = msg;
     };
     if ('ondeviceorientationabsolute' in window) window.addEventListener('deviceorientationabsolute', orientationHandler);
     else window.addEventListener('deviceorientation', orientationHandler);
     btn.disabled = true; btn.textContent = t('compass_on');
-    setTimeout(() => { if (!got && note) note.textContent = t('no_readings'); }, 3000);
+    setTimeout(() => { if (!got) { if (note) note.textContent = t('no_readings'); if (notice) { notice.textContent = `⚠ ${t('no_readings')}`; notice.classList.add('error'); } } }, 3000);
   }
 
   /* ---------- page: locations ---------- */

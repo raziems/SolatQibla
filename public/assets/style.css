@@ -241,6 +241,15 @@ table.month tr.friday td:first-child { color: var(--primary); }
 .stat .n { font-size: 1.3rem; font-weight: 700; font-variant-numeric: tabular-nums; }
 .stat .l { font-size: .72rem; color: var(--muted); text-transform: uppercase; letter-spacing: .04em; }
 .live-on { color: var(--success); font-weight: 600; }
+.notice {
+  width: 100%; max-width: 520px; padding: .7rem .9rem; border-radius: 10px; font-size: .9rem; line-height: 1.4;
+  background: var(--warning-soft); color: var(--warning); border: 1px solid color-mix(in srgb, var(--warning) 35%, transparent);
+}
+.notice.error { background: var(--danger-soft); color: var(--danger); border-color: color-mix(in srgb, var(--danger) 35%, transparent); }
+.turn { display: flex; flex-direction: column; align-items: center; gap: .35rem; text-align: center; }
+.turn-arrow { width: 110px; height: 110px; fill: var(--primary); transition: transform .25s ease-out, fill .4s; filter: drop-shadow(0 2px 4px rgba(0, 0, 0, .25)); }
+.turn-arrow.aligned { fill: var(--success); }
+.turn-text { font-size: 1.25rem; font-weight: 700; }
 /* when the live compass says the device is facing the Kaaba */
 #qibla { transition: background-color .4s, border-color .4s; }
 #qibla.aligned { background: var(--success-soft); border-color: var(--success); }
