@@ -95,6 +95,9 @@
       compass_denied_hint: 'Kebenaran kompas ditolak. Benarkan akses penderia gerakan untuk laman ini dalam tetapan pelayar, kemudian cuba lagi.',
       hold_flat: 'Pegang telefon secara mendatar dan pusingkan badan anda sehingga anak panah menghala ke atas.',
       no_readings: 'Tiada bacaan kompas diterima. Ciri ini memerlukan telefon yang mempunyai magnetometer dan sambungan HTTPS.',
+      no_magnetometer: 'Telefon ini tidak memberikan arah kompas (tiada magnetometer atau pelayar menyekatnya). Gunakan penanda emas pada dail berbanding utara benar.',
+      calib_poor: 'Kompas belum tepat. Gerakkan telefon membentuk angka 8 beberapa kali, jauh daripada logam, sehingga notis ini hilang.',
+      tilt_warn: 'Pegang telefon secara mendatar untuk bacaan yang tepat.',
       locations: 'Lokasi', current: 'Semasa', current_badge: 'semasa', favourites: 'Kegemaran',
       fav_hint: 'Ketik kegemaran untuk menggunakannya. Tekan bintang pada halaman waktu solat untuk menambahkan lokasi di sini. Kegemaran disimpan dalam pelayar ini.',
       no_favs: 'Belum ada kegemaran.', rename: 'Namakan semula', move_up: 'Alih ke atas', remove: 'Padam',
@@ -176,6 +179,9 @@
       compass_denied_hint: 'Compass permission was denied. Allow motion sensor access for this site in your browser settings, then try again.',
       hold_flat: 'Hold the phone flat and turn your body until the arrow points straight up.',
       no_readings: 'No compass readings yet. This needs a phone with a magnetometer and HTTPS.',
+      no_magnetometer: 'This phone does not provide a compass heading (no magnetometer, or the browser blocks it). Use the gold marker on the dial relative to true north instead.',
+      calib_poor: 'Compass not accurate yet. Move the phone in a figure-8 a few times, away from metal, until this notice disappears.',
+      tilt_warn: 'Hold the phone flat for an accurate reading.',
       locations: 'Locations', current: 'Current', current_badge: 'current', favourites: 'Favourites',
       fav_hint: 'Tap a favourite to use it. Star a location on the prayer times page to add it here. Favourites are stored in this browser.',
       no_favs: 'No favourites yet.', rename: 'Rename', move_up: 'Move up', remove: 'Remove',
@@ -656,6 +662,8 @@
           <button class="btn primary" id="liveBtn">${t('enable_compass')}</button>
         </div>
         <div class="turn" id="turn" hidden>
+          <div class="calib" id="calib" hidden><span class="fig8" aria-hidden="true">∞</span> ${t('calib_poor')}</div>
+          <div class="calib tilt" id="tilt" hidden>📱 ${t('tilt_warn')}</div>
           <svg class="turn-arrow" id="turnArrow" viewBox="0 0 100 100" aria-hidden="true"><path d="M50 6 L82 46 L62 46 L62 94 L38 94 L38 46 L18 46 Z"/></svg>
           <div class="turn-text" id="turnText"></div>
           <div class="small muted">${t('hold_flat')}</div>
@@ -726,14 +734,41 @@
       showProblem(t('compass_denied_hint'));
       return;
     }
-    let got = false, aligned = false;
+    const calib = $('#calib'), tilt = $('#tilt');
+    let got = false, aligned = false, noMagShown = false;
+    // calibration detection: iOS reports accuracy directly; Android is judged by how much the heading jitters
+    const samples = []; let poorSince = 0, goodSince = 0;
+    const angularSpread = (hs) => {
+      const toRad = (d) => (d * Math.PI) / 180;
+      const mean = (Math.atan2(hs.reduce((s, h) => s + Math.sin(toRad(h)), 0), hs.reduce((s, h) => s + Math.cos(toRad(h)), 0)) * 180) / Math.PI;
+      return Math.max(...hs.map((h) => Math.abs(((h - mean + 540) % 360) - 180)));
+    };
     orientationHandler = (ev) => {
       let heading = null;
       if (typeof ev.webkitCompassHeading === 'number') heading = ev.webkitCompassHeading; // iOS
       else if (ev.absolute && typeof ev.alpha === 'number') heading = (360 - ev.alpha) % 360; // Android
       else if (typeof ev.alpha === 'number' && ev.type === 'deviceorientationabsolute') heading = (360 - ev.alpha) % 360;
-      if (heading === null) return;
+      if (heading === null) {
+        // orientation events arrive but none is relative to north: no magnetometer (or the browser hides it)
+        if (typeof ev.alpha === 'number' && !got && !noMagShown) { noMagShown = true; showProblem(t('no_magnetometer')); }
+        return;
+      }
       if (!got) { got = true; if (notice) notice.hidden = true; if (turn) turn.hidden = false; }
+      const now = Date.now();
+      samples.push({ t: now, h: heading });
+      while (samples.length && now - samples[0].t > 1500) samples.shift();
+      let poor = false;
+      if (typeof ev.webkitCompassAccuracy === 'number') poor = ev.webkitCompassAccuracy < 0 || ev.webkitCompassAccuracy > 15;
+      else if (samples.length >= 6) poor = angularSpread(samples.map((s) => s.h)) > 20;
+      if (poor) { goodSince = 0; poorSince = poorSince || now; } else { poorSince = 0; goodSince = goodSince || now; }
+      if (calib) {
+        if (poorSince && now - poorSince > 800) calib.hidden = false;
+        else if (goodSince && now - goodSince > 2000) calib.hidden = true;
+      }
+      // heading is only trustworthy with the phone roughly flat
+      const tilted = Math.abs(ev.beta ?? 0) > 25 || Math.abs(ev.gamma ?? 0) > 25;
+      if (tilt) tilt.hidden = !tilted;
+      if (arrow) arrow.classList.toggle('dim', tilted || !calib?.hidden);
       const dial = $('#dial');
       if (dial) dial.style.transform = `rotate(${-heading}deg)`;
       const diff = ((bearing - heading + 540) % 360) - 180;
